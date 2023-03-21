@@ -3,7 +3,7 @@ package main.java;
 import java.time.LocalTime;
 
 public class Course {
-	
+
 	String coursename;
 	int capacity;
 	String year;
@@ -11,7 +11,7 @@ public class Course {
 	String lectureday;
 	LocalTime lecturetime;
 	double lectureduration;
-	
+
 	public Course() {
 	}
 
@@ -54,7 +54,7 @@ public class Course {
 	public double getLectureduration() {
 		return lectureduration;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getCoursename() + getCapacity() + getYear() + getDeliverymode() + getLectureday() +
