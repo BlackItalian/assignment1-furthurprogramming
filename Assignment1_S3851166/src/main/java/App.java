@@ -132,20 +132,34 @@ public class App {
 	}
 
 	public static void enrolledCourses() {
-		int count = 1;
+
+		boolean valid = true;
 
 		System.out.println("---------------------------------------------");
 		System.out.println("You have enrolled in the following course(s):");
 		System.out.println("---------------------------------------------");
-		for (Course course : courses) {
 
-			if (course.getCoursename().contains(tempCourses.get(count - 1))) {
-				// change lecture time to date/time format so that can display lecture time
-				// block
-				System.out.println(course.getCoursename() + course.getDeliverymode() + course.getLectureday()
-						+ course.getLecturetime());
-				count++;
+		while (valid) {
+			int count = 1;
+			int loopCount = 1;
+			while (loopCount != courses.size()) {
+				for (Course course : courses) {
+					if (selectedCourses.size() >= count
+							&& course.getCoursename().contains(selectedCourses.get(count - 1))) {
+						long[] result = addHours(course.getLectureduration());
+						Long hours = result[0];
+						Long minutes = result[1];
+						System.out.println(
+								"\t" + count + ")" + course.getCoursename() + course.getDeliverymode()
+										+ course.getLectureday()
+										+ course.getLecturetime() + "-"
+										+ course.getLecturetime().plusHours(hours).plusMinutes(minutes));
+						count++;
+					}
+				}
+				loopCount++;
 			}
+			mainMenu();
 		}
 	}
 
@@ -196,6 +210,7 @@ public class App {
 		}
 	}
 
+	// Convert decimal time lengths to hours and minutes
 	public static long[] addHours(double d) {
 		long hours = (long) d;
 		long minutes = (long) ((d - hours) * 10);
