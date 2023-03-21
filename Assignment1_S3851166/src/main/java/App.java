@@ -150,48 +150,50 @@ public class App {
 	}
 
 	public static void withdrawCourse() {
-		int count = 1;
-		int loopCount = 1;
+
+		boolean valid = true;
 		withdrawCourses.clear();
-		System.out.println(selectedCourses);
-		System.out.println(withdrawCourses);
+
 		System.out.println("---------------------------------------------");
 		System.out.println("Please choose a course to withdraw:");
 		System.out.println("---------------------------------------------");
 
-		while (loopCount != courses.size()) {
-			for (Course course : courses) {
-
-				if (selectedCourses.size() >= count
-						&& course.getCoursename().contains(selectedCourses.get(count - 1))) {
-					long[] result = addHours(course.getLectureduration());
-					Long hours = result[0];
-					Long minutes = result[1];
-					withdrawCourses.add(course.getCoursename());
-					System.out.println("\t" + count + ")" + course.getCoursename() + course.getDeliverymode()
-							+ course.getLectureday()
-							+ course.getLecturetime() + "-"
-							+ course.getLecturetime().plusHours(hours).plusMinutes(minutes));
-					count++;
+		while (valid) {
+			int count = 1;
+			int loopCount = 1;
+			while (loopCount != courses.size()) {
+				for (Course course : courses) {
+					if (selectedCourses.size() >= count
+							&& course.getCoursename().contains(selectedCourses.get(count - 1))) {
+						long[] result = addHours(course.getLectureduration());
+						Long hours = result[0];
+						Long minutes = result[1];
+						withdrawCourses.add(course.getCoursename());
+						System.out.println("\t" + count + ")" + course.getCoursename() + course.getDeliverymode()
+								+ course.getLectureday()
+								+ course.getLecturetime() + "-"
+								+ course.getLecturetime().plusHours(hours).plusMinutes(minutes));
+						count++;
+					}
 				}
+				loopCount++;
 			}
-			loopCount++;
-		}
 
-		System.out.println("\t" + count + ") " + "Go to main menu");
-		System.out.print("Please select: ");
-		int selection = userInput.nextInt();
+			System.out.println("\t" + count + ") " + "Go to main menu");
+			System.out.print("Please select: ");
+			int selection = userInput.nextInt();
 
-		if (selection < count) {
-			selectedCourses.remove(withdrawCourses.get(selection - 1));
-			System.out.println(selectedCourses);
-			mainMenu();
-		} else if (selection == count) {
-			mainMenu();
+			if (selection < count) {
+				selectedCourses.remove(withdrawCourses.get(selection - 1));
+				valid = false;
+				mainMenu();
+			} else if (selection == count) {
+				mainMenu();
+			}
+			System.out.println("---------------------------------------------");
+			System.out.println("Invalid Selection");
+			System.out.println("---------------------------------------------");
 		}
-		System.out.println("---------------------------------------------");
-		System.out.println("Invalid Selection");
-		System.out.println("---------------------------------------------");
 	}
 
 	public static long[] addHours(double d) {
