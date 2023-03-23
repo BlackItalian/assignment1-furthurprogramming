@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class App {
@@ -19,7 +20,7 @@ public class App {
 	static Scanner userInput = new Scanner(System.in);
 	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InvalidInput {
 		while (programRunning) {
 			populateList();
 			programRunning = false;
@@ -58,40 +59,48 @@ public class App {
 
 	// Main Menu
 	public static void mainMenu() {
-		tempCourses.clear();
-		System.out.println("---------------------------------------------");
-		System.out.println(">  Select from main menu");
-		System.out.println("---------------------------------------------");
-		System.out.print("1) Search by keyword to enroll"
-				+ "\n2) Show my enrolled courses"
-				+ "\n3) Withdraw from a course"
-				+ "\n4) Exit"
-				+ "\nPlease select: ");
+		boolean valid = false;
+		int userSelection = 0;
+		while (!valid) {
+			tempCourses.clear();
+			System.out.println("---------------------------------------------");
+			System.out.println(">  Select from main menu");
+			System.out.println("---------------------------------------------");
+			System.out.print("1) Search by keyword to enroll"
+					+ "\n2) Show my enrolled courses"
+					+ "\n3) Withdraw from a course"
+					+ "\n4) Exit"
+					+ "\nPlease select: ");
+			try {
+				userSelection = userInput.nextInt();
 
-		int userSelection = userInput.nextInt();
+				if (userSelection == 1) {
+					valid = true;
+					enrollInCourse();
+				} else if (userSelection == 2) {
+					valid = true;
+					enrolledCourses();
+				} else if (userSelection == 3) {
+					valid = true;
+					withdrawCourse();
+				} else if (userSelection == 4) {
+					System.exit(1);
+				} else if (userSelection > 4) {
+					throw new InvalidInput();
 
-		switch (userSelection) {
-			case 1:
-				enrollInCourse();
-				break;
-			case 2:
-				enrolledCourses();
-				break;
-			case 3:
-				withdrawCourse();
-				break;
-			case 4:
-				System.exit(1);
-				break;
-			default:
+				}
+			} catch (InvalidInput e) {
 				System.out.println("---------------------------------------------");
 				System.out.println("Invalid Selection");
+			} catch (InputMismatchException e) {
 				System.out.println("---------------------------------------------");
-				break;
+				System.out.println("Invalid Selection");
+				userInput.next();
+			}
 		}
 	}
 
-	public static void enrollInCourse() {
+	public static void enrollInCourse() throws InvalidInput {
 
 		boolean valid = true;
 
@@ -131,7 +140,7 @@ public class App {
 		}
 	}
 
-	public static void enrolledCourses() {
+	public static void enrolledCourses() throws InvalidInput {
 
 		boolean valid = true;
 
@@ -163,7 +172,7 @@ public class App {
 		}
 	}
 
-	public static void withdrawCourse() {
+	public static void withdrawCourse() throws InvalidInput {
 
 		boolean valid = true;
 		withdrawCourses.clear();
@@ -219,6 +228,7 @@ public class App {
 		}
 		return new long[] { hours, minutes };
 	}
+
 }
 // create function for iterating through the course arraylist to reuse the code
 // block
