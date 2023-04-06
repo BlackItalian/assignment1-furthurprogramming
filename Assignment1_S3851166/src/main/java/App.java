@@ -12,24 +12,25 @@ import java.util.Scanner;
 
 public class App {
 
-	static boolean programRunning = true;
-	private static ArrayList<Course> courses = new ArrayList<Course>();
-	static ArrayList<String> tempCourses = new ArrayList<String>();
-	static ArrayList<String> withdrawCourses = new ArrayList<String>();
-	static ArrayList<String> selectedCourses = new ArrayList<String>();
-	static Scanner userInput = new Scanner(System.in);
-	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
+	boolean programRunning = true;
+	ArrayList<Course> courses = new ArrayList<Course>();
+	ArrayList<String> tempCourses = new ArrayList<String>();
+	ArrayList<String> withdrawCourses = new ArrayList<String>();
+	ArrayList<String> selectedCourses = new ArrayList<String>();
+	Scanner userInput = new Scanner(System.in);
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
 
-	public static void main(String[] args) throws InvalidInput {
-		while (programRunning) {
-			populateList();
-			programRunning = false;
-			System.out.println("Welcome to MyTimetable!");
-			mainMenu();
-		}
+	public static void main(String[] args) {
+		new App();
 	}
 
-	public static ArrayList<Course> populateList() {
+	public App() {
+		populateList();
+		System.out.println("Welcome to MyTimetable!");
+		mainMenu();
+	}
+
+	public ArrayList<Course> populateList() {
 		String path = "Assignment1_S3851166/src/main/resources/course.csv";
 		String line = "";
 		int lineNumber = 0;
@@ -58,7 +59,7 @@ public class App {
 	}
 
 	// Main Menu
-	public static void mainMenu() {
+	public void mainMenu() {
 		boolean valid = false;
 		int userSelection = 0;
 		while (!valid) {
@@ -100,7 +101,7 @@ public class App {
 		}
 	}
 
-	public static void enrollInCourse() throws InvalidInput {
+	public void enrollInCourse() throws InvalidInput {
 
 		boolean valid = true;
 
@@ -111,10 +112,11 @@ public class App {
 		System.out.println("> Select from mathcing list");
 		System.out.println("---------------------------------------------");
 
+		// Show selected list
 		while (valid) {
 			int count = 1;
 			for (Course course : courses) {
-				if (course.getCoursename().contains(keyword)) {
+				if (course.getCoursename().toLowerCase().contains(keyword.toLowerCase())) {
 					System.out.println("\t" + count + ") " + course.getCoursename());
 					tempCourses.add(course.getCoursename());
 					count++;
@@ -123,32 +125,55 @@ public class App {
 			System.out.println("\t" + count + ") " + "Go to main menu");
 			System.out.print("Please select: ");
 
-			int selection = userInput.nextInt();
+			// List Selection
+			try {
+				int selection = userInput.nextInt();
 
-			if (selection < count) {
-				selectedCourses.add(tempCourses.get(selection - 1));
-				System.out.println("You have now enrolled in the course " + tempCourses.get(selection - 1));
-				valid = false;
-				mainMenu();
-				break;
-			} else if (selection == count) {
-				mainMenu();
+				if (selection < count && !selectedCourses.contains(tempCourses.get(selection - 1))) {
+					selectedCourses.add(tempCourses.get(selection - 1));
+					System.out.println("You have now enrolled in the course " + tempCourses.get(selection - 1));
+					valid = false;
+					mainMenu();
+					break;
+				} else if (selection < count && selectedCourses.contains(tempCourses.get(selection - 1))) {
+					System.out.println("---------------------------------------------");
+					System.out.println("Already enrolled in this course");
+					System.out.println("---------------------------------------------");
+				} else if (selection == count) {
+					mainMenu();
+				} else if (selection < count) {
+					throw new InvalidInput();
+				}
+			} catch (InvalidInput e) {
+				System.out.println("---------------------------------------------");
+				System.out.println("Invalid Selection");
+				System.out.println("---------------------------------------------");
+			} catch (InputMismatchException e) {
+				System.out.println("---------------------------------------------");
+				System.out.println("Invalid Selection");
+				System.out.println("---------------------------------------------");
+				userInput.next();
 			}
-			System.out.println("---------------------------------------------");
-			System.out.println("Invalid Selection");
-			System.out.println("---------------------------------------------");
 		}
 	}
 
-	public static void enrolledCourses() throws InvalidInput {
+	public void enrolledCourses() {
 
 		boolean valid = true;
 
-		System.out.println("---------------------------------------------");
-		System.out.println("You have enrolled in the following course(s):");
-		System.out.println("---------------------------------------------");
+		// Check if enrolled in any courses
+		if (selectedCourses.size() <= 0) {
+			System.out.println("---------------------------------------------");
+			System.out.println("Not yet Enrolled in any course(s)");
+			mainMenu();
+		}
 
+		// Display enrolled courses
 		while (valid) {
+			System.out.println("---------------------------------------------");
+			System.out.println("You have enrolled in the following course(s):");
+			System.out.println("---------------------------------------------");
+
 			int count = 1;
 			int loopCount = 1;
 			while (loopCount != courses.size()) {
@@ -172,16 +197,24 @@ public class App {
 		}
 	}
 
-	public static void withdrawCourse() throws InvalidInput {
+	public void withdrawCourse() throws InvalidInput {
 
 		boolean valid = true;
 		withdrawCourses.clear();
 
-		System.out.println("---------------------------------------------");
-		System.out.println("Please choose a course to withdraw:");
-		System.out.println("---------------------------------------------");
+		// Check if enrolled in any courses
+		if (selectedCourses.size() <= 0) {
+			System.out.println("---------------------------------------------");
+			System.out.println("Not yet Enrolled in any course(s)");
+			mainMenu();
+		}
 
+		// Show enrolled list
 		while (valid) {
+			System.out.println("---------------------------------------------");
+			System.out.println("Please choose a course to withdraw:");
+			System.out.println("---------------------------------------------");
+
 			int count = 1;
 			int loopCount = 1;
 			while (loopCount != courses.size()) {
@@ -204,19 +237,31 @@ public class App {
 
 			System.out.println("\t" + count + ") " + "Go to main menu");
 			System.out.print("Please select: ");
-			int selection = userInput.nextInt();
 
-			if (selection < count) {
-				selectedCourses.remove(withdrawCourses.get(selection - 1));
-				valid = false;
-				mainMenu();
-			} else if (selection == count) {
-				mainMenu();
+			// Select course to withdraw
+			try {
+				int selection = userInput.nextInt();
+
+				if (selection < count) {
+					selectedCourses.remove(withdrawCourses.get(selection - 1));
+					valid = false;
+					mainMenu();
+				} else if (selection == count) {
+					mainMenu();
+				} else if (selection < count) {
+					throw new InvalidInput();
+				}
+			} catch (InvalidInput e) {
+				System.out.println("---------------------------------------------");
+				System.out.println("Invalid Selection");
+				System.out.println("---------------------------------------------");
+			} catch (InputMismatchException e) {
+				System.out.println("---------------------------------------------");
+				System.out.println("Invalid Selection");
+				System.out.println("---------------------------------------------");
 			}
-			System.out.println("---------------------------------------------");
-			System.out.println("Invalid Selection");
-			System.out.println("---------------------------------------------");
 		}
+
 	}
 
 	// Convert decimal time lengths to hours and minutes
@@ -230,5 +275,3 @@ public class App {
 	}
 
 }
-// create function for iterating through the course arraylist to reuse the code
-// block
